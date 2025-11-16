@@ -29,9 +29,9 @@ import type { OrderedListItemMeta } from './types/ItemMeta';
 export type ListParams = BlockToolConstructorOptions<ListData | OldListData, ListConfig>;
 
 /**
- * Default class of the component used in editor
+ * Base class with the main implementation
  */
-export default class EditorjsList {
+class EditorjsListBase {
   /**
    * Notify core that read-only mode is supported
    */
@@ -47,11 +47,19 @@ export default class EditorjsList {
   }
 
   /**
+   * Flag to determine if checklist should be disabled
+   * Can be overridden in subclasses
+   */
+  protected static get checklistDisabled(): boolean {
+    return false;
+  }
+
+  /**
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
    */
-  public get toolbox(): ToolboxConfig {
+  public static get toolbox(): ToolboxConfig {
     const toolboxItems: ToolboxConfigEntry[] = [
       {
         icon: IconListBulleted,
@@ -70,7 +78,7 @@ export default class EditorjsList {
     ];
 
     // Add checklist option only if not disabled
-    if (!this.config?.disableChecklist) {
+    if (!this.checklistDisabled) {
       toolboxItems.push({
         icon: IconChecklist,
         title: 'Checklist',
@@ -113,7 +121,7 @@ export default class EditorjsList {
   } {
     return {
       export: (data) => {
-        return EditorjsList.joinRecursive(data);
+        return EditorjsListBase.joinRecursive(data);
       },
       import: (content, config) => {
         return {
@@ -251,7 +259,7 @@ export default class EditorjsList {
    */
   private static joinRecursive(data: ListData | ListItem): string {
     return data.items
-      .map(item => `${item.content} ${EditorjsList.joinRecursive(item)}`)
+      .map(item => `${item.content} ${EditorjsListBase.joinRecursive(item)}`)
       .join('');
   }
 
@@ -310,7 +318,9 @@ export default class EditorjsList {
     ];
 
     // Add checklist option only if not disabled
-    if (!this.config?.disableChecklist) {
+    // Use both config option and static flag for backwards compatibility
+    const checklistDisabled = this.config?.disableChecklist || (this.constructor as typeof EditorjsListBase).checklistDisabled;
+    if (!checklistDisabled) {
       defaultTunes.push({
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
@@ -486,5 +496,24 @@ export default class EditorjsList {
 
         break;
     }
+  }
+}
+
+/**
+ * Default export - List tool with all features including checklist
+ */
+export default class EditorjsList extends EditorjsListBase {
+  protected static get checklistDisabled(): boolean {
+    return false;
+  }
+}
+
+/**
+ * Named export - List tool without checklist option
+ * Use this if you want to disable the checklist feature
+ */
+export class ListWithoutChecklist extends EditorjsListBase {
+  protected static get checklistDisabled(): boolean {
+    return true;
   }
 }
