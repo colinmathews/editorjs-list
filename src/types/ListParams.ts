@@ -99,4 +99,9 @@ export interface ListConfig {
    * @default undefined // All counter types are available when not specified
    */
   counterTypes?: OlCounterType[];
+  /**
+   * When set to true, disables the checklist option in toolbox and settings
+   * @default false
+   */
+  disableChecklist?: boolean;
 }

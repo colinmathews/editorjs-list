@@ -51,30 +51,38 @@ export default class EditorjsList {
    * icon - Tool icon's SVG
    * title - title to show in toolbox
    */
-  public static get toolbox(): ToolboxConfig {
-    return [
-      {
-        icon: IconListBulleted,
-        title: 'Unordered List',
-        data: {
-          style: 'unordered',
+  public static get toolbox(): ToolboxConfig | ((config?: ListConfig) => ToolboxConfig) {
+    return (config?: ListConfig) => {
+      const toolboxItems = [
+        {
+          icon: IconListBulleted,
+          title: 'Unordered List',
+          data: {
+            style: 'unordered',
+          },
         },
-      },
-      {
-        icon: IconListNumbered,
-        title: 'Ordered List',
-        data: {
-          style: 'ordered',
+        {
+          icon: IconListNumbered,
+          title: 'Ordered List',
+          data: {
+            style: 'ordered',
+          },
         },
-      },
-      {
-        icon: IconChecklist,
-        title: 'Checklist',
-        data: {
-          style: 'checklist',
-        },
-      },
-    ];
+      ];
+
+      // Add checklist option only if not disabled
+      if (!config?.disableChecklist) {
+        toolboxItems.push({
+          icon: IconChecklist,
+          title: 'Checklist',
+          data: {
+            style: 'checklist',
+          },
+        });
+      }
+
+      return toolboxItems;
+    };
   }
 
   /**
@@ -301,7 +309,11 @@ export default class EditorjsList {
           this.listStyle = 'ordered';
         },
       },
-      {
+    ];
+
+    // Add checklist option only if not disabled
+    if (!this.config?.disableChecklist) {
+      defaultTunes.push({
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
         closeOnActivate: true,
@@ -309,8 +321,8 @@ export default class EditorjsList {
         onActivate: () => {
           this.listStyle = 'checklist';
         },
-      },
-    ];
+      });
+    }
 
     if (this.listStyle === 'ordered') {
       const startWithElement = renderToolboxInput(
