@@ -1,4 +1,4 @@
-import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
+import type { API, BlockAPI, PasteConfig, ToolboxConfig, ToolboxConfigEntry } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
   MenuConfigItem,
@@ -51,38 +51,36 @@ export default class EditorjsList {
    * icon - Tool icon's SVG
    * title - title to show in toolbox
    */
-  public static get toolbox(): ToolboxConfig | ((config?: ListConfig) => ToolboxConfig) {
-    return (config?: ListConfig) => {
-      const toolboxItems = [
-        {
-          icon: IconListBulleted,
-          title: 'Unordered List',
-          data: {
-            style: 'unordered',
-          },
+  public get toolbox(): ToolboxConfig {
+    const toolboxItems: ToolboxConfigEntry[] = [
+      {
+        icon: IconListBulleted,
+        title: 'Unordered List',
+        data: {
+          style: 'unordered',
         },
-        {
-          icon: IconListNumbered,
-          title: 'Ordered List',
-          data: {
-            style: 'ordered',
-          },
+      },
+      {
+        icon: IconListNumbered,
+        title: 'Ordered List',
+        data: {
+          style: 'ordered',
         },
-      ];
+      },
+    ];
 
-      // Add checklist option only if not disabled
-      if (!config?.disableChecklist) {
-        toolboxItems.push({
-          icon: IconChecklist,
-          title: 'Checklist',
-          data: {
-            style: 'checklist',
-          },
-        });
-      }
+    // Add checklist option only if not disabled
+    if (!this.config?.disableChecklist) {
+      toolboxItems.push({
+        icon: IconChecklist,
+        title: 'Checklist',
+        data: {
+          style: 'checklist',
+        },
+      });
+    }
 
-      return toolboxItems;
-    };
+    return toolboxItems;
   }
 
   /**
