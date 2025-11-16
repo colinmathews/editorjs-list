@@ -51,6 +51,12 @@ jobs:
       - name: Build
         run: yarn run build
 
+      - name: Create distribution archive
+        run: |
+          cd dist
+          tar -czf ../editorjs-list-dist.tar.gz .
+          cd ..
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -79,8 +85,17 @@ jobs:
               }
             }
             ```
+
+            ## Files
+
+            - `editorjs-list-dist.tar.gz` - Complete distribution package with all build artifacts
+            - `editorjs-list.mjs` - ES Module build
+            - `editorjs-list.umd.js` - UMD build
           files: |
-            dist/**/*
+            editorjs-list-dist.tar.gz
+            dist/editorjs-list.mjs
+            dist/editorjs-list.umd.js
+            dist/index.d.ts
           draft: false
           prerelease: false
         env:
